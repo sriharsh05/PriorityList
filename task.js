@@ -137,3 +137,55 @@ if (args[0]=='del'){
     }
   }
 }
+
+// Marking as done
+if (args[0]=='done'){
+  const index = args[1];
+  if (index == null){
+    console.log("Error: Missing NUMBER for marking tasks as done.");
+  }
+  else{
+    if (!fs.existsSync(taskFile)) {
+      console.log("Error: no incomplete item with index #"+index+" exists.");
+    }
+    else {
+      const tasks = fs
+      .readFileSync(taskFile, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => line.split(" "))
+      .map(([priority, ...parts]) => ({
+        priority: parseInt(priority),
+        task: parts.join(" "),
+      }));
+      if(index <=0 || index > tasks.length || tasks[0].task == ''){
+        console.log("Error: no incomplete item with index #"+index+" exists.");
+      }
+      else{
+        const completedtask = tasks.splice(index-1,1)[0].task;
+        const updatedContent = tasks.map((item) => item.priority + ' ' + item.task).join('\n'); 
+        fs.writeFileSync(taskFile, updatedContent, (err) => {
+            if (err) {
+              console.error('Error writing to file:', err);
+            }
+        });
+
+        if (!fs.existsSync(completedFile)) {
+          fs.writeFileSync(completedFile, completedtask, (err) => {
+            if (err) {
+              console.error('Error writing to file:', err);
+            }
+          });
+        }
+        else {
+          fs.appendFileSync(completedFile, completedtask+"\n", (err) => {
+            if (err) {
+              console.error('Error writing to file:', err);
+            }
+          });
+        }
+        console.log("Marked item as done.");
+      }
+  }
+} 
+}
