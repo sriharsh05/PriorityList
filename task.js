@@ -171,14 +171,14 @@ if (args[0]=='done'){
         });
 
         if (!fs.existsSync(completedFile)) {
-          fs.writeFileSync(completedFile, completedtask, (err) => {
+          fs.writeFileSync(completedFile, completedtask + "\n", (err) => {
             if (err) {
               console.error('Error writing to file:', err);
             }
           });
         }
         else {
-          fs.appendFileSync(completedFile, completedtask+"\n", (err) => {
+          fs.appendFileSync(completedFile, completedtask + "\n", (err) => {
             if (err) {
               console.error('Error writing to file:', err);
             }
@@ -188,4 +188,33 @@ if (args[0]=='done'){
       }
   }
 } 
+}
+
+if (args[0]=='report'){
+  const tasks = fs
+      .readFileSync(taskFile, "utf8")
+      .trim()
+      .split("\n")
+      .map((line) => line.split(" "))
+      .map(([priority, ...parts]) => ({
+        priority: parseInt(priority),
+        task: parts.join(" "),
+      }));
+   console.log(`Pending : ${tasks.length}`);
+    tasks.forEach((task, idx) => {
+    const taskLine = `${idx + 1}. ${task.task} [${task.priority}]`;
+    console.log(taskLine);
+    });
+
+    const completed = fs
+    .readFileSync(completedFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => line.split(',').join(' '));
+    
+    console.log(`\n\Completed : ${completed.length}`);
+    completed.forEach((task, idx) => {
+      const taskLine = `${idx + 1}. ${task.split(',').join(' ')}`;
+      console.log(taskLine);
+      });
 }
