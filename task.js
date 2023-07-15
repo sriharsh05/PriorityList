@@ -99,3 +99,41 @@ if (args[0]=='ls'){
     } 
   }
 }
+
+// Deleting tasks from list
+if (args[0]=='del'){
+  const index = args[1];
+  if (index == null){
+    console.log("Error: Missing NUMBER for deleting tasks.");
+  }
+  if (!fs.existsSync(taskFile)) {
+    console.log("Error: task with index #"+index+" does not exist. Nothing deleted.");
+  }
+  else {
+    const tasks = fs
+    .readFileSync(taskFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => line.split(" "))
+    .map(([priority, ...parts]) => ({
+      priority: parseInt(priority),
+      task: parts.join(" "),
+    }));
+    
+    if(index <=0 || index > tasks.length || tasks[0].task == ''){
+      console.log("Error: task with index #"+index+" does not exist. Nothing deleted.");
+    }
+    else {
+    tasks.splice(index-1,1)[0];
+    const updatedContent = tasks
+        .map((item) => item.priority + ' ' + item.task)
+        .join('\n'); 
+        fs.writeFileSync(taskFile, updatedContent, (err) => {
+          if (err) {
+            console.error('Error writing to file:', err);
+          }
+   });
+    console.log("Deleted task #"+index);
+    }
+  }
+}
