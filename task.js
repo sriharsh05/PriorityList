@@ -1,6 +1,9 @@
 const fs = require('fs');
 const args = process.argv.slice(2);
 
+const taskFile = `${process.cwd()}/task.txt`;
+const completedFile = `${process.cwd()}/completed.txt`;
+
 let usage = `Usage :-
 $ ./task add 2 hello world    # Add a new item with priority 2 and text "hello world" to the list
 $ ./task ls                   # Show incomplete priority list items sorted by priority in ascending order
@@ -23,15 +26,19 @@ if (args[0] === 'add') {
     console.log("Error: Missing tasks string. Nothing added!");
     return;
   }
-
-  fs.writeFile('task.txt', '', 'utf8', (err) => {
-    if (err) {
-      console.error('Error creating file:', err);
-    } 
-  });
-
+ 
+  // If the file is not present in the directory
+  if (!fs.existsSync(taskFile)) {
+    const updatedContent = priority + ' ' + task;
+    fs.writeFileSync(taskFile, updatedContent, (err) => {
+      if (err) {
+        console.error('Error writing to file:', err);
+      } 
+    });
+  } 
+  else {
   const tasks = fs
-    .readFileSync('task.txt', "utf8")
+    .readFileSync(taskFile, "utf8")
     .trim()
     .split("\n")
     .map((line) => line.split(" "))
@@ -40,25 +47,55 @@ if (args[0] === 'add') {
       task: parts.join(" "),
     }))
 
+  // If the file is present and not empty  
   if (tasks[0].task != '') {
     tasks.push({ priority: parseInt(priority), task: task });
     const updatedContent = tasks
         .sort((a, b) => a.priority - b.priority)
         .map((item) => item.priority + ' ' + item.task)
         .join('\n'); 
-        fs.writeFile('task.txt', updatedContent, (err) => {
+        fs.writeFileSync(taskFile, updatedContent, (err) => {
           if (err) {
             console.error('Error writing to file:', err);
           }
- });    
+   });    
   }
+  // If the file is present and empty 
   else {
-    const updatedContent = priority + ' ' + task;
-    fs.writeFile('task.txt', updatedContent, (err) => {
-      if (err) {
-        console.error('Error writing to file:', err);
-      } 
-});
+        const updatedContent = priority + ' ' + task;
+        fs.writeFileSync(taskFile, updatedContent, (err) => {
+          if (err) {
+            console.error('Error writing to file:', err);
+          } 
+    });
   }
+} 
   console.log(content);    
+}
+
+// Listing tasks
+if (args[0]=='ls'){
+  if (!fs.existsSync(taskFile)) {
+    console.log("There are no pending tasks!");
+  }
+  else{
+    const tasks = fs
+    .readFileSync(taskFile, "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => line.split(" "))
+    .map(([priority, ...parts]) => ({
+      priority: parseInt(priority),
+      task: parts.join(" "),
+    }));
+    if (tasks[0].task == ''){
+      console.log("There are no pending tasks!");
+    }
+    else{
+      tasks.forEach((task, idx) => {
+        const taskLine = `${idx + 1}. ${task.task} [${task.priority}]`;
+        console.log(taskLine);
+    });
+    } 
+  }
 }
