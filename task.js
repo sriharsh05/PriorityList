@@ -1,3 +1,4 @@
+const fs = require('fs');
 const args = process.argv.slice(2);
 
 let usage = `Usage :-
@@ -11,3 +12,26 @@ $ ./task report               # Statistics`;
 if (args[0]=="help" || args[0]==null){
 console.log(usage);
 }
+
+if (args[0]=="add"){
+    
+    const priority = args[1];
+    const task = args[2];
+    if(task ==  null){
+        console.log("Error: Missing tasks string. Nothing added!");
+    }
+    const content = "Added task: \""+task+"\" with priority "+ priority;
+    const data = priority+" "+task;
+    fs.writeFile('task.txt', data, (err) => {
+        if (err) {
+          console.error('Error writing to file:', err);
+        } else {
+          console.log('Task added successfully!');
+        }
+      });
+
+    console.log(content);
+}
+
+
+
