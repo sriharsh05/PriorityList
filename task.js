@@ -13,25 +13,52 @@ if (args[0]=="help" || args[0]==null){
 console.log(usage);
 }
 
-if (args[0]=="add"){
-    
-    const priority = args[1];
-    const task = args[2];
-    if(task ==  null){
-        console.log("Error: Missing tasks string. Nothing added!");
-    }
-    const content = "Added task: \""+task+"\" with priority "+ priority;
-    const data = priority+" "+task;
-    fs.writeFile('task.txt', data, (err) => {
-        if (err) {
-          console.error('Error writing to file:', err);
-        } else {
-          console.log('Task added successfully!');
-        }
-      });
+// Adding task
+if (args[0] === 'add') {
+  const priority = args[1];
+  const task = args[2];
+  const content = "Added task: \"" + task + "\" with priority " + priority;
 
-    console.log(content);
+   if (task == null) {
+    console.log("Error: Missing tasks string. Nothing added!");
+    return;
+  }
+
+  fs.writeFile('task.txt', '', 'utf8', (err) => {
+    if (err) {
+      console.error('Error creating file:', err);
+    } 
+  });
+
+  const tasks = fs
+    .readFileSync('task.txt', "utf8")
+    .trim()
+    .split("\n")
+    .map((line) => line.split(" "))
+    .map(([priority, ...parts]) => ({
+      priority: parseInt(priority),
+      task: parts.join(" "),
+    }))
+
+  if (tasks[0].task != '') {
+    tasks.push({ priority: parseInt(priority), task: task });
+    const updatedContent = tasks
+        .sort((a, b) => a.priority - b.priority)
+        .map((item) => item.priority + ' ' + item.task)
+        .join('\n'); 
+        fs.writeFile('task.txt', updatedContent, (err) => {
+          if (err) {
+            console.error('Error writing to file:', err);
+          }
+ });    
+  }
+  else {
+    const updatedContent = priority + ' ' + task;
+    fs.writeFile('task.txt', updatedContent, (err) => {
+      if (err) {
+        console.error('Error writing to file:', err);
+      } 
+});
+  }
+  console.log(content);    
 }
-
-
-
