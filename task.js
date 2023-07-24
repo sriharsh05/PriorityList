@@ -210,11 +210,10 @@ if (args[0]=='report'){
     .readFileSync(completedFile, "utf8")
     .trim()
     .split("\n")
-    .map((line) => line.split(',').join(' '));
     
     console.log(`\n\Completed : ${completed.length}`);
     completed.forEach((task, idx) => {
-      const taskLine = `${idx + 1}. ${task.split(',').join(' ')}`;
+      const taskLine = `${idx + 1}. ${task}`;
       console.log(taskLine);
       });
 }
