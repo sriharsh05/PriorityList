@@ -12,12 +12,12 @@ $ ./task done INDEX           # Mark the incomplete item with the given index as
 $ ./task help                 # Show usage
 $ ./task report               # Statistics`;
 
-if (args[0]=="help" || args[0]==null){
+if (args[0]==="help" || args[0]==null){
 console.log(usage);
 }
 
 // Adding task
-if (args[0] === 'add') {
+else if (args[0] === 'add') {
   const priority = args[1];
   const task = args[2];
   const content = "Added task: \"" + task + "\" with priority " + priority;
@@ -74,7 +74,7 @@ if (args[0] === 'add') {
 }
 
 // Listing tasks
-if (args[0]=='ls'){
+else if (args[0]==='ls'){
   if (!fs.existsSync(taskFile)) {
     console.log("There are no pending tasks!");
   }
@@ -101,7 +101,7 @@ if (args[0]=='ls'){
 }
 
 // Deleting tasks from list
-if (args[0]=='del'){
+else if (args[0]==='del'){
   const index = args[1];
   if (index == null){
     console.log("Error: Missing NUMBER for deleting tasks.");
@@ -139,7 +139,7 @@ if (args[0]=='del'){
 }
 
 // Marking as done
-if (args[0]=='done'){
+else if (args[0]==='done'){
   const index = args[1];
   if (index == null){
     console.log("Error: Missing NUMBER for marking tasks as done.");
@@ -190,7 +190,7 @@ if (args[0]=='done'){
 } 
 }
 
-if (args[0]=='report'){
+else if (args[0]==='report'){
   const tasks = fs
       .readFileSync(taskFile, "utf8")
       .trim()
